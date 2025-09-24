@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LED1 - Panel Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .card { @apply bg-white shadow rounded-lg; }
+        .btn { @apply px-4 py-2 rounded-md font-medium transition-colors; }
+        .btn-primary { @apply bg-blue-600 text-white hover:bg-blue-700; }
+        .btn-secondary { @apply bg-gray-100 text-gray-900 hover:bg-gray-200 border border-gray-300; }
+        .badge { @apply px-2 py-1 text-xs font-medium rounded-full; }
+        .badge-success { @apply bg-green-100 text-green-800; }
+        .badge-warning { @apply bg-yellow-100 text-yellow-800; }
+        .badge-danger { @apply bg-red-100 text-red-800; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white border-b border-gray-200 px-4 py-4 lg:px-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">LED1 - Panel Demo</h1>
+                <p class="text-sm text-gray-600 mt-1" id="current-date"></p>
+            </div>
+            <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                🎭 MODO DEMO
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Message -->
+    <div id="demo-message" class="hidden bg-green-50 border-l-4 border-green-400 p-4 mx-4 mt-4">
+        <p class="text-green-700" id="message-text"></p>
+    </div>
+
+    <!-- Main content -->
+    <main class="py-10">
+        <div class="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <!-- KPIs -->
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+                <div class="card p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-medium text-gray-500">Clientes Activos</h3>
+                        <span class="text-2xl">👥</span>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-900">5</div>
+                    <p class="text-xs text-gray-500 mt-1">Clientes con contratos vigentes</p>
+                </div>
+
+                <div class="card p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-medium text-gray-500">MRR Esperado</h3>
+                        <span class="text-2xl">💰</span>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-900">$800.000</div>
+                    <p class="text-xs text-gray-500 mt-1">Ingresos mensuales recurrentes</p>
+                </div>
+
+                <div class="card p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-medium text-gray-500">A Cobrar Hoy</h3>
+                        <span class="text-2xl">📅</span>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-900">$350.000</div>
+                    <p class="text-xs text-gray-500 mt-1">2 clientes</p>
+                </div>
+
+                <div class="card p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-medium text-gray-500">Vencidos</h3>
+                        <span class="text-2xl">⚠️</span>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-900">$180.000</div>
+                    <p class="text-xs text-gray-500 mt-1">1 cliente atrasado</p>
+                </div>
+            </div>
+
+            <!-- A Cobrar Hoy -->
+            <div class="card mb-8">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900">A Cobrar Hoy</h2>
+                    <p class="text-sm text-gray-600">Clientes con vencimiento hoy</p>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 border rounded-lg bg-blue-50 border-blue-200">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <p class="font-medium text-gray-900">Juan Pérez</p>
+                                    <span class="badge badge-success">Día 15</span>
+                                </div>
+                                <p class="text-sm text-gray-600">Panadería El Buen Pan</p>
+                                <p class="text-sm font-semibold text-green-600">$150.000</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button class="btn btn-secondary text-sm" onclick="showMessage('Recordatorio enviado a Juan Pérez (DEMO)')">
+                                    📱 Recordatorio
+                                </button>
+                                <button class="btn btn-primary text-sm" onclick="showMessage('Cliente Juan Pérez marcado como pagado (DEMO)')">
+                                    Marcar Cobrado
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between p-4 border rounded-lg bg-blue-50 border-blue-200">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <p class="font-medium text-gray-900">Ana López</p>
+                                    <span class="badge badge-success">Día 5</span>
+                                </div>
+                                <p class="text-sm text-gray-600">Inmobiliaria López & Asoc.</p>
+                                <p class="text-sm font-semibold text-green-600">$200.000</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button class="btn btn-secondary text-sm" onclick="showMessage('Recordatorio enviado a Ana López (DEMO)')">
+                                    📱 Recordatorio
+                                </button>
+                                <button class="btn btn-primary text-sm" onclick="showMessage('Cliente Ana López marcado como pagado (DEMO)')">
+                                    Marcar Cobrado
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clientes Vencidos -->
+            <div class="card mb-8">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900">Clientes Vencidos</h2>
+                    <p class="text-sm text-gray-600">Clientes con pagos atrasados de este mes</p>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 border rounded-lg border-red-200 bg-red-50">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <p class="font-medium text-gray-900">María González</p>
+                                    <span class="badge badge-danger">Vencido día 1</span>
+                                </div>
+                                <p class="text-sm text-gray-600">Farmacia Central</p>
+                                <p class="text-sm font-semibold text-red-600">$180.000</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button class="btn btn-secondary text-sm" onclick="showMessage('Recordatorio enviado a María González (DEMO)')">
+                                    📱 Recordatorio
+                                </button>
+                                <button class="btn btn-secondary text-sm" onclick="showMessage('Cliente María González marcado como pagado (DEMO)')">
+                                    Marcar Cobrado
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Clientes Preview -->
+            <div class="card">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900">👥 Vista Previa - Lista de Clientes</h2>
+                    <p class="text-sm text-gray-600">Gestión completa de clientes (6 clientes de ejemplo)</p>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <!-- Cliente 1 -->
+                        <div class="flex items-center justify-between p-4 border rounded-lg">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-semibold text-gray-900">Juan Pérez</h3>
+                                    <span class="badge badge-success">Activo</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-1">Panadería El Buen Pan</p>
+                                <div class="flex flex-wrap gap-4 text-sm text-gray-500">
+                                    <span>📱 +5491134567890</span>
+                                    <span>📅 Día 15 de cada mes</span>
+                                    <span>💰 $150.000</span>
+                                    <span>📆 Desde 15/01/2024</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button class="btn btn-secondary text-sm" onclick="showMessage('Funcionalidad disponible en versión completa')">
+                                    ✏️ Editar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Cliente 2 -->
+                        <div class="flex items-center justify-between p-4 border rounded-lg">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-semibold text-gray-900">Laura Martínez</h3>
+                                    <span class="badge badge-warning">Pausado</span>
+                                </div>
+                                <p class="text-sm text-gray-600 mb-1">Clínica Dental Sonrisas</p>
+                                <div class="flex flex-wrap gap-4 text-sm text-gray-500">
+                                    <span>📱 +5491189012345</span>
+                                    <span>📅 Día 25 de cada mes</span>
+                                    <span>💰 $175.000</span>
+                                    <span>📆 Desde 25/01/2024</span>
+                                </div>
+                                <p class="text-sm text-gray-500 italic mt-1">📝 Pausado temporalmente por renovaciones</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button class="btn btn-secondary text-sm" onclick="showMessage('Cliente activado (DEMO)')">
+                                    ▶️ Activar
+                                </button>
+                                <button class="btn btn-secondary text-sm" onclick="showMessage('Funcionalidad disponible en versión completa')">
+                                    ✏️ Editar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Más clientes indicador -->
+                        <div class="text-center py-4">
+                            <p class="text-gray-500">... y 4 clientes más en la versión completa</p>
+                            <p class="text-sm text-gray-400 mt-2">
+                                Funcionalidades: Filtros, búsqueda, export CSV, formularios completos
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo Info -->
+            <div class="card mt-8">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900">🎭 Información del Demo</h2>
+                    <p class="text-sm text-gray-600">Esta es una versión de demostración del Panel LED1</p>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-gray-900 mb-3">✅ Funcionalidades Implementadas:</h4>
+                            <ul class="space-y-2 text-sm text-gray-600">
+                                <li>• Dashboard con KPIs visuales y responsivos</li>
+                                <li>• Lista de clientes a cobrar hoy con acciones</li>
+                                <li>• Alertas visuales para clientes vencidos</li>
+                                <li>• Diseño moderno con shadcn/ui components</li>
+                                <li>• Responsive design para móvil y desktop</li>
+                                <li>• Gestión completa de estados de clientes</li>
+                                <li>• Formularios validados con Zod</li>
+                                <li>• Integración WhatsApp Cloud API</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-900 mb-3">🚀 Con Configuración Completa:</h4>
+                            <ul class="space-y-2 text-sm text-gray-600">
+                                <li>• Base de datos Supabase con RLS</li>
+                                <li>• Autenticación con Google/Apple + Magic Links</li>
+                                <li>• Recordatorios WhatsApp automáticos diarios</li>
+                                <li>• Edge Functions para automatización</li>
+                                <li>• Página de configuración completa</li>
+                                <li>• Export real de datos a CSV</li>
+                                <li>• Logs completos de mensajes enviados</li>
+                                <li>• Deployment optimizado en Vercel</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <p class="text-blue-800 text-sm">
+                            <strong>🎯 Próximos Pasos:</strong> Para activar la versión completa, seguir las instrucciones
+                            del README.md para configurar Supabase, WhatsApp Cloud API y deploy en Vercel.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Set current date
+        document.getElementById('current-date').textContent = 'Hoy: ' + new Date().toLocaleDateString('es-AR');
+
+        // Show demo messages
+        function showMessage(text) {
+            const messageEl = document.getElementById('demo-message');
+            const textEl = document.getElementById('message-text');
+            textEl.textContent = text;
+            messageEl.classList.remove('hidden');
+            setTimeout(() => {
+                messageEl.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎭 LED1 Demo Dashboard cargado correctamente!');
+        });
+    </script>
+</body>
+</html>
