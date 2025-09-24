@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "export": "next export",
+    "export": "echo 'Export is handled by next build with output: export'",
     "deploy": "npm run build && npm run export"
   },
   "dependencies": {
