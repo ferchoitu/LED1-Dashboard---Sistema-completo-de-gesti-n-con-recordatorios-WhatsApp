@@ -20,7 +20,8 @@ import {
   LogOut,
   Eye,
   X,
-  Save
+  Save,
+  TrendingUp
 } from 'lucide-react'
 
 // Mock data para clientes

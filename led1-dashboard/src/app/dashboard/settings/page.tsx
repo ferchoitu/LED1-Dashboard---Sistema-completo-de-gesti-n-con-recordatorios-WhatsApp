@@ -20,7 +20,9 @@ import {
   Mail,
   User,
   Check,
-  AlertCircle
+  AlertCircle,
+  TrendingUp,
+  DollarSign
 } from 'lucide-react'
 
 // Configuración inicial mock
