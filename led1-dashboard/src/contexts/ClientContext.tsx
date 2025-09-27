@@ -28,15 +28,30 @@ export interface Expense {
   description: string
 }
 
+export interface Payment {
+  id: number
+  clientId: number
+  clientName: string
+  amount: number
+  date: string
+  month: number
+  year: number
+  status: 'paid' | 'pending' | 'overdue'
+  billingDay: number
+}
+
 interface ClientContextType {
   clients: Client[]
   expenses: Expense[]
+  payments: Payment[]
   addClient: (client: Omit<Client, 'id'>) => void
   updateClient: (id: number, client: Partial<Client>) => void
   deleteClient: (id: number) => void
   addExpense: (expense: Omit<Expense, 'id'>) => void
   updateExpense: (id: number, expense: Partial<Expense>) => void
   deleteExpense: (id: number) => void
+  markAsPaid: (clientId: number, amount: number, month?: number, year?: number) => void
+  getClientPayments: (clientId: number, month?: number, year?: number) => Payment[]
 }
 
 const ClientContext = createContext<ClientContextType | undefined>(undefined)
@@ -163,17 +178,22 @@ const initialExpenses: Expense[] = [
 export function ClientProvider({ children }: { children: ReactNode }) {
   const [clients, setClients] = useState<Client[]>(initialClients)
   const [expenses, setExpenses] = useState<Expense[]>(initialExpenses)
+  const [payments, setPayments] = useState<Payment[]>([])
 
   // Cargar datos del localStorage si existen
   useEffect(() => {
     const savedClients = localStorage.getItem('led1-clients')
     const savedExpenses = localStorage.getItem('led1-expenses')
+    const savedPayments = localStorage.getItem('led1-payments')
 
     if (savedClients) {
       setClients(JSON.parse(savedClients))
     }
     if (savedExpenses) {
       setExpenses(JSON.parse(savedExpenses))
+    }
+    if (savedPayments) {
+      setPayments(JSON.parse(savedPayments))
     }
   }, [])
 
@@ -185,6 +205,10 @@ export function ClientProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     localStorage.setItem('led1-expenses', JSON.stringify(expenses))
   }, [expenses])
+
+  useEffect(() => {
+    localStorage.setItem('led1-payments', JSON.stringify(payments))
+  }, [payments])
 
   const addClient = (clientData: Omit<Client, 'id'>) => {
     const newClient = {
@@ -222,16 +246,51 @@ export function ClientProvider({ children }: { children: ReactNode }) {
     setExpenses(prev => prev.filter(expense => expense.id !== id))
   }
 
+  const markAsPaid = (clientId: number, amount: number, month?: number, year?: number) => {
+    const now = new Date()
+    const client = clients.find(c => c.id === clientId)
+    if (!client) return
+
+    const paymentMonth = month || now.getMonth() + 1
+    const paymentYear = year || now.getFullYear()
+
+    const newPayment: Payment = {
+      id: Math.max(...payments.map(p => p.id), 0) + 1,
+      clientId,
+      clientName: client.name,
+      amount,
+      date: now.toISOString().split('T')[0],
+      month: paymentMonth,
+      year: paymentYear,
+      status: 'paid',
+      billingDay: client.billingDay
+    }
+
+    setPayments(prev => [...prev, newPayment])
+  }
+
+  const getClientPayments = (clientId: number, month?: number, year?: number) => {
+    return payments.filter(payment => {
+      if (payment.clientId !== clientId) return false
+      if (month && payment.month !== month) return false
+      if (year && payment.year !== year) return false
+      return true
+    })
+  }
+
   return (
     <ClientContext.Provider value={{
       clients,
       expenses,
+      payments,
       addClient,
       updateClient,
       deleteClient,
       addExpense,
       updateExpense,
-      deleteExpense
+      deleteExpense,
+      markAsPaid,
+      getClientPayments
     }}>
       {children}
     </ClientContext.Provider>

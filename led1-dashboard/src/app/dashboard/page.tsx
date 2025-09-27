@@ -23,7 +23,7 @@ import { useAuth } from '@/contexts/AuthContext'
 export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [loading, setLoading] = useState(true)
-  const { clients } = useClients()
+  const { clients, markAsPaid, getClientPayments } = useClients()
   const { logout } = useAuth()
 
   useEffect(() => {
@@ -68,8 +68,10 @@ export default function DashboardPage() {
     }).format(amount)
   }
 
-  const markAsPaid = (clientId: number, amount: number) => {
-    alert(`Cliente ${clientId} marcado como pagado: ${formatCurrency(amount)}`)
+  const handleMarkAsPaid = (clientId: number, amount: number) => {
+    const today = new Date()
+    markAsPaid(clientId, amount, today.getMonth() + 1, today.getFullYear())
+    alert(`Cliente marcado como pagado: ${formatCurrency(amount)}`)
   }
 
   const sendReminder = (clientId: number, phone: string) => {
@@ -244,7 +246,7 @@ export default function DashboardPage() {
                           📱 Recordatorio
                         </button>
                         <button
-                          onClick={() => markAsPaid(client.id, client.monthlyAmount)}
+                          onClick={() => handleMarkAsPaid(client.id, client.monthlyAmount)}
                           className="nexus-btn nexus-btn-primary px-4 py-2 text-sm"
                         >
                           Marcar Pagado
@@ -284,7 +286,7 @@ export default function DashboardPage() {
                           📱 Recordatorio
                         </button>
                         <button
-                          onClick={() => markAsPaid(client.id, client.monthlyAmount)}
+                          onClick={() => handleMarkAsPaid(client.id, client.monthlyAmount)}
                           className="px-4 py-2 text-sm bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                         >
                           Marcar Pagado
