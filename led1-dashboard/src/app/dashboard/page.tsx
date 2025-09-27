@@ -15,7 +15,8 @@ import {
   Home,
   Settings,
   LogOut,
-  TrendingUp
+  TrendingUp,
+  PiggyBank
 } from 'lucide-react'
 import { useClients } from '@/contexts/ClientContext'
 import { useAuth } from '@/contexts/AuthContext'
@@ -23,7 +24,7 @@ import { useAuth } from '@/contexts/AuthContext'
 export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [loading, setLoading] = useState(true)
-  const { clients, markAsPaid, getClientPayments } = useClients()
+  const { clients, markAsPaid, getClientPayments, payments, expenses } = useClients()
   const { logout } = useAuth()
 
   useEffect(() => {
@@ -34,32 +35,64 @@ export default function DashboardPage() {
   // Calcular datos reales desde el contexto
   const today = new Date()
   const currentDay = today.getDate()
+  const currentMonth = today.getMonth() + 1
+  const currentYear = today.getFullYear()
 
   const activeClients = clients.filter(client => client.status === 'active')
+
+  // Obtener clientes que ya pagaron este mes
+  const paidClientIds = new Set(
+    payments
+      .filter(payment => payment.month === currentMonth && payment.year === currentYear)
+      .map(payment => payment.clientId)
+  )
 
   const monthlyIncome = activeClients.reduce((total, client) =>
     total + client.monthlyAmount, 0
   )
 
   const clientesToday = activeClients.filter(client =>
-    client.billingDay === currentDay
+    client.billingDay === currentDay && !paidClientIds.has(client.id)
   )
 
   const todaysIncome = clientesToday.reduce((total, client) =>
     total + client.monthlyAmount, 0
   )
 
-  const overdueClients = activeClients.filter(client => {
-    const daysPastDue = currentDay - client.billingDay
-    return daysPastDue > 0 && daysPastDue <= 30
-  }).map(client => ({
-    ...client,
-    daysPastDue: currentDay - client.billingDay
-  }))
+  const overdueClients = activeClients
+    .filter(client => {
+      // Excluir clientes que ya pagaron este mes
+      if (paidClientIds.has(client.id)) return false
+
+      const daysPastDue = currentDay - client.billingDay
+      return daysPastDue > 0 && daysPastDue <= 30
+    })
+    .map(client => ({
+      ...client,
+      daysPastDue: currentDay - client.billingDay
+    }))
 
   const overdueAmount = overdueClients.reduce((total, client) =>
     total + client.monthlyAmount, 0
   )
+
+  // Calcular ganancia neta descontando gastos
+  const monthlyFixedCosts = expenses
+    .filter(expense => expense.category === 'fixed' && expense.frequency === 'monthly')
+    .reduce((total, expense) => total + expense.amount, 0)
+
+  const currentMonthVideoCosts = expenses
+    .filter(expense => {
+      if (expense.category !== 'video') return false
+      if (!expense.date) return false
+
+      const expenseDate = new Date(expense.date)
+      return expenseDate.getMonth() + 1 === currentMonth && expenseDate.getFullYear() === currentYear
+    })
+    .reduce((total, expense) => total + expense.amount, 0)
+
+  const totalMonthlyExpenses = monthlyFixedCosts + currentMonthVideoCosts
+  const netProfitThisMonth = monthlyIncome - totalMonthlyExpenses
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-AR', {
@@ -80,7 +113,7 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-800 flex items-center justify-center">
         <div className="nexus-card p-8 text-center">
           <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Cargando dashboard...</p>
@@ -90,7 +123,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-800 flex">
       {/* Sidebar */}
       <div className={`nexus-sidebar fixed inset-y-0 left-0 w-64 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 transition-transform duration-300 z-30`}>
         <div className="p-6">
@@ -169,7 +202,7 @@ export default function DashboardPage() {
         {/* Content */}
         <main className="p-6">
           {/* KPIs Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
             <div className="nexus-card p-6 fade-in">
               <div className="flex items-center justify-between mb-4">
                 <div className="p-2 bg-blue-100 rounded-lg">
@@ -216,6 +249,22 @@ export default function DashboardPage() {
               <h3 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Vencidos</h3>
               <p className="text-3xl font-bold text-gray-900 mt-2">{formatCurrency(overdueAmount)}</p>
               <p className="text-sm text-red-600 mt-1">{overdueClients.length} clientes atrasados</p>
+            </div>
+
+            <div className="nexus-card p-6 fade-in">
+              <div className="flex items-center justify-between mb-4">
+                <div className={`p-2 rounded-lg ${netProfitThisMonth >= 0 ? 'bg-emerald-100' : 'bg-orange-100'}`}>
+                  <PiggyBank className={`w-6 h-6 ${netProfitThisMonth >= 0 ? 'text-emerald-600' : 'text-orange-600'}`} />
+                </div>
+                <Eye className="w-5 h-5 text-gray-400" />
+              </div>
+              <h3 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Ganancia Neta</h3>
+              <p className={`text-3xl font-bold mt-2 ${netProfitThisMonth >= 0 ? 'text-emerald-900' : 'text-orange-900'}`}>
+                {formatCurrency(netProfitThisMonth)}
+              </p>
+              <p className="text-sm text-gray-600 mt-1">
+                Gastos: {formatCurrency(totalMonthlyExpenses)}
+              </p>
             </div>
           </div>
 
@@ -298,6 +347,61 @@ export default function DashboardPage() {
               </div>
             </div>
           )}
+
+          {/* Monthly Financial Summary */}
+          <div className="nexus-card p-6 mb-8 fade-in">
+            <h2 className="text-xl font-bold text-gray-900 mb-6">Resumen Financiero del Mes</h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Ingresos */}
+              <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                <h3 className="font-semibold text-green-800 mb-2">💰 Ingresos</h3>
+                <p className="text-2xl font-bold text-green-900">{formatCurrency(monthlyIncome)}</p>
+                <p className="text-sm text-green-700">{activeClients.length} clientes activos</p>
+              </div>
+
+              {/* Gastos */}
+              <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                <h3 className="font-semibold text-red-800 mb-2">💸 Gastos Totales</h3>
+                <p className="text-2xl font-bold text-red-900">{formatCurrency(totalMonthlyExpenses)}</p>
+                <div className="text-sm text-red-700 mt-2">
+                  <p>• Fijos: {formatCurrency(monthlyFixedCosts)}</p>
+                  <p>• Videos: {formatCurrency(currentMonthVideoCosts)}</p>
+                </div>
+              </div>
+
+              {/* Ganancia Neta */}
+              <div className={`p-4 rounded-lg border ${netProfitThisMonth >= 0 ? 'bg-emerald-50 border-emerald-200' : 'bg-orange-50 border-orange-200'}`}>
+                <h3 className={`font-semibold mb-2 ${netProfitThisMonth >= 0 ? 'text-emerald-800' : 'text-orange-800'}`}>
+                  {netProfitThisMonth >= 0 ? '🎉' : '⚠️'} Ganancia Neta
+                </h3>
+                <p className={`text-2xl font-bold ${netProfitThisMonth >= 0 ? 'text-emerald-900' : 'text-orange-900'}`}>
+                  {formatCurrency(netProfitThisMonth)}
+                </p>
+                <p className={`text-sm mt-1 ${netProfitThisMonth >= 0 ? 'text-emerald-700' : 'text-orange-700'}`}>
+                  {netProfitThisMonth >= 0 ? 'Mes rentable' : 'Revisar gastos'}
+                </p>
+              </div>
+            </div>
+
+            {/* Progress bar */}
+            <div className="mt-6">
+              <div className="flex justify-between text-sm font-medium text-gray-700 mb-2">
+                <span>Margen de ganancia</span>
+                <span>{monthlyIncome > 0 ? Math.round((netProfitThisMonth / monthlyIncome) * 100) : 0}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div
+                  className={`h-3 rounded-full transition-all duration-300 ${
+                    netProfitThisMonth >= 0 ? 'bg-emerald-600' : 'bg-orange-600'
+                  }`}
+                  style={{
+                    width: `${Math.max(0, Math.min(100, monthlyIncome > 0 ? Math.abs((netProfitThisMonth / monthlyIncome) * 100) : 0))}%`
+                  }}
+                ></div>
+              </div>
+            </div>
+          </div>
 
           {/* Quick actions */}
           <div className="nexus-card p-6 fade-in">
