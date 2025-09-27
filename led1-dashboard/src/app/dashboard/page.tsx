@@ -17,66 +17,47 @@ import {
   LogOut,
   TrendingUp
 } from 'lucide-react'
-
-// Mock data para el demo
-const mockData = {
-  kpis: {
-    clientesActivos: 24,
-    ingresoMensual: 48750,
-    porCobrarHoy: 12300,
-    vencidos: 3400
-  },
-  clientesToday: [
-    {
-      id: 1,
-      name: 'Restaurant El Buen Sabor',
-      amount: 4500,
-      billingDay: 26,
-      phone: '+54 11 1234-5678'
-    },
-    {
-      id: 2,
-      name: 'Farmacia Central',
-      amount: 3200,
-      billingDay: 26,
-      phone: '+54 11 8765-4321'
-    },
-    {
-      id: 3,
-      name: 'Gimnasio Fitness Plus',
-      amount: 4600,
-      billingDay: 26,
-      phone: '+54 11 5555-0000'
-    }
-  ],
-  overdueClients: [
-    {
-      id: 4,
-      name: 'Bar La Esquina',
-      amount: 2800,
-      billingDay: 20,
-      phone: '+54 11 9999-1111',
-      daysPastDue: 6
-    },
-    {
-      id: 5,
-      name: 'Panadería Don José',
-      amount: 600,
-      billingDay: 15,
-      phone: '+54 11 7777-2222',
-      daysPastDue: 11
-    }
-  ]
-}
+import { useClients } from '@/contexts/ClientContext'
 
 export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [loading, setLoading] = useState(true)
+  const { clients } = useClients()
 
   useEffect(() => {
     // Simular carga de datos
     setTimeout(() => setLoading(false), 800)
   }, [])
+
+  // Calcular datos reales desde el contexto
+  const today = new Date()
+  const currentDay = today.getDate()
+
+  const activeClients = clients.filter(client => client.status === 'active')
+
+  const monthlyIncome = activeClients.reduce((total, client) =>
+    total + client.monthlyAmount, 0
+  )
+
+  const clientesToday = activeClients.filter(client =>
+    client.billingDay === currentDay
+  )
+
+  const todaysIncome = clientesToday.reduce((total, client) =>
+    total + client.monthlyAmount, 0
+  )
+
+  const overdueClients = activeClients.filter(client => {
+    const daysPastDue = currentDay - client.billingDay
+    return daysPastDue > 0 && daysPastDue <= 30
+  }).map(client => ({
+    ...client,
+    daysPastDue: currentDay - client.billingDay
+  }))
+
+  const overdueAmount = overdueClients.reduce((total, client) =>
+    total + client.monthlyAmount, 0
+  )
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-AR', {
@@ -190,8 +171,8 @@ export default function DashboardPage() {
                 <Eye className="w-5 h-5 text-gray-400" />
               </div>
               <h3 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Clientes Activos</h3>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{mockData.kpis.clientesActivos}</p>
-              <p className="text-sm text-green-600 mt-1">+2 este mes</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{activeClients.length}</p>
+              <p className="text-sm text-green-600 mt-1">Total de clientes activos</p>
             </div>
 
             <div className="nexus-card p-6 fade-in">
@@ -202,8 +183,8 @@ export default function DashboardPage() {
                 <Eye className="w-5 h-5 text-gray-400" />
               </div>
               <h3 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Ingreso Mensual</h3>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{formatCurrency(mockData.kpis.ingresoMensual)}</p>
-              <p className="text-sm text-green-600 mt-1">+8.2% vs mes anterior</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{formatCurrency(monthlyIncome)}</p>
+              <p className="text-sm text-green-600 mt-1">Ingreso total mensual</p>
             </div>
 
             <div className="nexus-card p-6 fade-in">
@@ -214,8 +195,8 @@ export default function DashboardPage() {
                 <Eye className="w-5 h-5 text-gray-400" />
               </div>
               <h3 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Por Cobrar Hoy</h3>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{formatCurrency(mockData.kpis.porCobrarHoy)}</p>
-              <p className="text-sm text-gray-600 mt-1">{mockData.clientesToday.length} clientes</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{formatCurrency(todaysIncome)}</p>
+              <p className="text-sm text-gray-600 mt-1">{clientesToday.length} clientes</p>
             </div>
 
             <div className="nexus-card p-6 fade-in">
@@ -226,29 +207,29 @@ export default function DashboardPage() {
                 <Eye className="w-5 h-5 text-gray-400" />
               </div>
               <h3 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Vencidos</h3>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{formatCurrency(mockData.kpis.vencidos)}</p>
-              <p className="text-sm text-red-600 mt-1">{mockData.overdueClients.length} clientes atrasados</p>
+              <p className="text-3xl font-bold text-gray-900 mt-2">{formatCurrency(overdueAmount)}</p>
+              <p className="text-sm text-red-600 mt-1">{overdueClients.length} clientes atrasados</p>
             </div>
           </div>
 
           {/* Clients to collect today */}
-          {mockData.clientesToday.length > 0 && (
+          {clientesToday.length > 0 && (
             <div className="nexus-card p-6 mb-8 fade-in">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-gray-900">Por Cobrar Hoy</h2>
                 <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">
-                  {mockData.clientesToday.length} clientes
+                  {clientesToday.length} clientes
                 </span>
               </div>
 
               <div className="space-y-4">
-                {mockData.clientesToday.map((client) => (
+                {clientesToday.map((client) => (
                   <div key={client.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <h3 className="font-semibold text-gray-900">{client.name}</h3>
                         <p className="text-sm text-gray-600">Día de facturación: {client.billingDay}</p>
-                        <p className="text-lg font-bold text-green-600">{formatCurrency(client.amount)}</p>
+                        <p className="text-lg font-bold text-green-600">{formatCurrency(client.monthlyAmount)}</p>
                       </div>
                       <div className="flex gap-2">
                         <button
@@ -258,7 +239,7 @@ export default function DashboardPage() {
                           📱 Recordatorio
                         </button>
                         <button
-                          onClick={() => markAsPaid(client.id, client.amount)}
+                          onClick={() => markAsPaid(client.id, client.monthlyAmount)}
                           className="nexus-btn nexus-btn-primary px-4 py-2 text-sm"
                         >
                           Marcar Pagado
@@ -272,23 +253,23 @@ export default function DashboardPage() {
           )}
 
           {/* Overdue clients */}
-          {mockData.overdueClients.length > 0 && (
+          {overdueClients.length > 0 && (
             <div className="nexus-card p-6 mb-8 fade-in border-red-200 bg-red-50/30">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-gray-900">Clientes Vencidos</h2>
                 <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">
-                  {mockData.overdueClients.length} clientes
+                  {overdueClients.length} clientes
                 </span>
               </div>
 
               <div className="space-y-4">
-                {mockData.overdueClients.map((client) => (
+                {overdueClients.map((client) => (
                   <div key={client.id} className="p-4 bg-white rounded-lg border border-red-200">
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <h3 className="font-semibold text-gray-900">{client.name}</h3>
                         <p className="text-sm text-red-600">Vencido hace {client.daysPastDue} días (día {client.billingDay})</p>
-                        <p className="text-lg font-bold text-red-600">{formatCurrency(client.amount)}</p>
+                        <p className="text-lg font-bold text-red-600">{formatCurrency(client.monthlyAmount)}</p>
                       </div>
                       <div className="flex gap-2">
                         <button
@@ -298,7 +279,7 @@ export default function DashboardPage() {
                           📱 Recordatorio
                         </button>
                         <button
-                          onClick={() => markAsPaid(client.id, client.amount)}
+                          onClick={() => markAsPaid(client.id, client.monthlyAmount)}
                           className="px-4 py-2 text-sm bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                         >
                           Marcar Pagado
