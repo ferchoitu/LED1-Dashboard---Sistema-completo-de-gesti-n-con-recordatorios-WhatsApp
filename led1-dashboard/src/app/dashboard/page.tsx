@@ -18,11 +18,13 @@ import {
   TrendingUp
 } from 'lucide-react'
 import { useClients } from '@/contexts/ClientContext'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const { clients } = useClients()
+  const { logout } = useAuth()
 
   useEffect(() => {
     // Simular carga de datos
@@ -119,7 +121,10 @@ export default function DashboardPage() {
         </div>
 
         <div className="absolute bottom-6 left-6 right-6">
-          <button className="nexus-sidebar-item w-full justify-start text-red-600 hover:bg-red-50">
+          <button
+            onClick={logout}
+            className="nexus-sidebar-item w-full justify-start text-red-600 hover:bg-red-50"
+          >
             <LogOut className="w-5 h-5 mr-3" />
             Cerrar Sesión
           </button>

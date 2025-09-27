@@ -21,85 +21,12 @@ import {
   ChevronDown,
   Download
 } from 'lucide-react'
-
-// Mock data para gastos
-const mockExpenses = {
-  fixedCosts: [
-    {
-      id: 1,
-      name: 'Alquiler oficina',
-      amount: 25000,
-      frequency: 'monthly',
-      category: 'fixed',
-      description: 'Alquiler mensual de oficina'
-    },
-    {
-      id: 2,
-      name: 'Internet y servicios',
-      amount: 8500,
-      frequency: 'monthly',
-      category: 'fixed',
-      description: 'Internet, luz, agua'
-    },
-    {
-      id: 3,
-      name: 'Seguro equipos',
-      amount: 3200,
-      frequency: 'monthly',
-      category: 'fixed',
-      description: 'Seguro pantallas LED'
-    }
-  ],
-  videoCosts: [
-    {
-      id: 4,
-      name: 'Video Restaurant El Buen Sabor',
-      amount: 4500,
-      client: 'Restaurant El Buen Sabor',
-      date: '2024-01-15',
-      category: 'video',
-      description: 'Creación contenido publicitario mensual'
-    },
-    {
-      id: 5,
-      name: 'Video Farmacia Central',
-      amount: 3200,
-      client: 'Farmacia Central',
-      date: '2024-01-20',
-      category: 'video',
-      description: 'Video promocional productos'
-    },
-    {
-      id: 6,
-      name: 'Video Gimnasio Fitness Plus',
-      amount: 4600,
-      client: 'Gimnasio Fitness Plus',
-      date: '2024-02-10',
-      category: 'video',
-      description: 'Video promocional clases nuevas'
-    },
-    {
-      id: 7,
-      name: 'Video Bar La Esquina',
-      amount: 2800,
-      client: 'Bar La Esquina',
-      date: '2023-12-05',
-      category: 'video',
-      description: 'Video promocional happy hour'
-    },
-    {
-      id: 8,
-      name: 'Video Panadería Don José',
-      amount: 1800,
-      client: 'Panadería Don José',
-      date: '2023-11-25',
-      category: 'video',
-      description: 'Video productos navideños'
-    }
-  ]
-}
+import { useClients } from '@/contexts/ClientContext'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function ExpensesPage() {
+  const { expenses, clients, addExpense, updateExpense, deleteExpense } = useClients()
+  const { logout } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('fixed')
@@ -155,11 +82,13 @@ export default function ExpensesPage() {
   }
 
   const getFilteredFixedCosts = () => {
-    return filterExpensesByDate(mockExpenses.fixedCosts)
+    const fixedExpenses = expenses.filter(expense => expense.category === 'fixed')
+    return filterExpensesByDate(fixedExpenses)
   }
 
   const getFilteredVideoCosts = () => {
-    return filterExpensesByDate(mockExpenses.videoCosts)
+    const videoExpenses = expenses.filter(expense => expense.category === 'video')
+    return filterExpensesByDate(videoExpenses)
   }
 
   const getTotalFixedCosts = () => {
@@ -225,14 +154,33 @@ export default function ExpensesPage() {
   }
 
   const handleSave = () => {
-    // Aquí se implementaría la lógica para guardar
-    alert(`Gasto ${modalType === 'add' ? 'agregado' : 'actualizado'}: ${formData.name} - ${formatCurrency(Number(formData.amount))}`)
+    if (!formData.name || !formData.amount) {
+      alert('Por favor completa todos los campos requeridos')
+      return
+    }
+
+    const expenseData = {
+      name: formData.name,
+      amount: Number(formData.amount),
+      frequency: formData.frequency as 'monthly' | 'yearly' | 'quarterly',
+      client: formData.client,
+      date: formData.date,
+      category: formData.category as 'fixed' | 'video',
+      description: formData.description
+    }
+
+    if (modalType === 'add') {
+      addExpense(expenseData)
+    } else if (selectedExpense) {
+      updateExpense(selectedExpense.id, expenseData)
+    }
+
     closeModal()
   }
 
   const handleDelete = (id: number, name: string) => {
     if (confirm(`¿Estás seguro de eliminar el gasto "${name}"?`)) {
-      alert(`Gasto eliminado: ${name}`)
+      deleteExpense(id)
     }
   }
 
@@ -281,7 +229,10 @@ export default function ExpensesPage() {
         </div>
 
         <div className="absolute bottom-6 left-6 right-6">
-          <button className="nexus-sidebar-item w-full justify-start text-red-600 hover:bg-red-50">
+          <button
+            onClick={logout}
+            className="nexus-sidebar-item w-full justify-start text-red-600 hover:bg-red-50"
+          >
             <LogOut className="w-5 h-5 mr-3" />
             Cerrar Sesión
           </button>
@@ -652,13 +603,18 @@ export default function ExpensesPage() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Cliente
                     </label>
-                    <input
-                      type="text"
+                    <select
                       value={formData.client}
                       onChange={(e) => setFormData({ ...formData, client: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                      placeholder="Nombre del cliente"
-                    />
+                    >
+                      <option value="">Seleccionar cliente</option>
+                      {clients.filter(client => client.status === 'active').map(client => (
+                        <option key={client.id} value={client.name}>
+                          {client.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   <div>

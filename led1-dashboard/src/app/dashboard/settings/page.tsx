@@ -24,6 +24,7 @@ import {
   TrendingUp,
   DollarSign
 } from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
 
 // Configuración inicial mock
 const initialSettings = {
@@ -48,6 +49,7 @@ const initialSettings = {
 }
 
 export default function SettingsPage() {
+  const { logout } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('profile')
@@ -228,7 +230,10 @@ export default function SettingsPage() {
         </div>
 
         <div className="absolute bottom-6 left-6 right-6">
-          <button className="nexus-sidebar-item w-full justify-start text-red-600 hover:bg-red-50">
+          <button
+            onClick={logout}
+            className="nexus-sidebar-item w-full justify-start text-red-600 hover:bg-red-50"
+          >
             <LogOut className="w-5 h-5 mr-3" />
             Cerrar Sesión
           </button>
