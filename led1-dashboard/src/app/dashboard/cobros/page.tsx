@@ -288,7 +288,7 @@ export default function CobrosPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-800 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="nexus-card p-8 text-center">
           <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Cargando resúmenes de cobro...</p>
@@ -298,7 +298,7 @@ export default function CobrosPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-800 flex">
+    <div className="min-h-screen bg-white flex">
       {/* Sidebar */}
       <div className={`nexus-sidebar fixed inset-y-0 left-0 w-64 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 transition-transform duration-300 z-30`}>
         <div className="p-6">
