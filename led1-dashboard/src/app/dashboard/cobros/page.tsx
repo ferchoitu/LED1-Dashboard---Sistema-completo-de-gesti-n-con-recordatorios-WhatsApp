@@ -149,9 +149,10 @@ export default function CobrosPage() {
           <!-- Header -->
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px;">
             <div>
-              <div style="width: 120px; height: 40px; background: #6366f1; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; margin-bottom: 16px;">
-                LED1
-              </div>
+              <svg width="120" height="40" style="margin-bottom: 16px;" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
+                <rect width="120" height="40" fill="#6366f1" rx="4"/>
+                <text x="60" y="25" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">LED1</text>
+              </svg>
               <div style="color: #6b7280; font-size: 14px;">
                 <p style="margin: 0;">Pantallas LED Publicitarias</p>
                 <p style="margin: 0;">Gestión Digital de Contenidos</p>
@@ -644,7 +645,12 @@ export default function CobrosPage() {
                 {/* Header */}
                 <div className="flex justify-between items-start mb-8">
                   <div>
-                    <img src="/logo-led1.png" alt="LED1" className="h-12 mb-4" />
+                    <div className="mb-4">
+                      <svg width="120" height="40" viewBox="0 0 120 40" className="h-12">
+                        <rect width="120" height="40" fill="#6366f1" rx="4"/>
+                        <text x="60" y="25" fontFamily="Arial, sans-serif" fontSize="18" fontWeight="bold" fill="white" textAnchor="middle">LED1</text>
+                      </svg>
+                    </div>
                     <div className="text-sm text-gray-600">
                       <p>Pantallas LED Publicitarias</p>
                       <p>Gestión Digital de Contenidos</p>
