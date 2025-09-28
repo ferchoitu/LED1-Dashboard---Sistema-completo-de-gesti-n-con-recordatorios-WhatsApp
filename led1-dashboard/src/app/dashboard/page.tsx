@@ -202,7 +202,7 @@ export default function DashboardPage() {
         {/* Content */}
         <main className="p-6">
           {/* KPIs Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div className="nexus-card p-6 fade-in">
               <div className="flex items-center justify-between mb-4">
                 <div className="p-2 bg-blue-100 rounded-lg">
@@ -239,17 +239,6 @@ export default function DashboardPage() {
               <p className="text-sm text-gray-600 mt-1">{clientesToday.length} clientes</p>
             </div>
 
-            <div className="nexus-card p-6 fade-in">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-2 bg-red-100 rounded-lg">
-                  <AlertTriangle className="w-6 h-6 text-red-600" />
-                </div>
-                <Eye className="w-5 h-5 text-gray-400" />
-              </div>
-              <h3 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Vencidos</h3>
-              <p className="text-3xl font-bold text-gray-900 mt-2">{formatCurrency(overdueAmount)}</p>
-              <p className="text-sm text-red-600 mt-1">{overdueClients.length} clientes atrasados</p>
-            </div>
 
             <div className="nexus-card p-6 fade-in">
               <div className="flex items-center justify-between mb-4">
@@ -304,6 +293,28 @@ export default function DashboardPage() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* Empty state when no clients */}
+          {activeClients.length === 0 && (
+            <div className="nexus-card p-8 mb-8 fade-in text-center">
+              <div className="max-w-md mx-auto">
+                <div className="p-4 bg-gray-100 rounded-full inline-block mb-4">
+                  <Users className="w-8 h-8 text-gray-400" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900 mb-2">¡Bienvenido a LED1 Dashboard!</h2>
+                <p className="text-gray-600 mb-6">
+                  Comienza agregando tu primer cliente para gestionar tus pantallas LED y generar ingresos.
+                </p>
+                <a
+                  href="/dashboard/clients"
+                  className="nexus-btn nexus-btn-primary inline-flex items-center"
+                >
+                  <Plus className="w-5 h-5 mr-2" />
+                  Agregar Primer Cliente
+                </a>
               </div>
             </div>
           )}

@@ -321,6 +321,35 @@ export default function ClientsPage() {
                   ))}
                 </tbody>
               </table>
+
+              {/* Empty state */}
+              {filteredClients.length === 0 && (
+                <div className="p-12 text-center">
+                  <div className="max-w-md mx-auto">
+                    <div className="p-4 bg-gray-100 rounded-full inline-block mb-4">
+                      <Users className="w-8 h-8 text-gray-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      {searchTerm || statusFilter !== 'all' ? 'No hay clientes que coincidan' : 'No hay clientes registrados'}
+                    </h3>
+                    <p className="text-gray-600 mb-6">
+                      {searchTerm || statusFilter !== 'all'
+                        ? 'Prueba ajustando los filtros de búsqueda.'
+                        : 'Comienza agregando tu primer cliente para gestionar tus pantallas LED.'
+                      }
+                    </p>
+                    {!searchTerm && statusFilter === 'all' && (
+                      <button
+                        onClick={() => setShowAddModal(true)}
+                        className="nexus-btn nexus-btn-primary inline-flex items-center"
+                      >
+                        <Plus className="w-5 h-5 mr-2" />
+                        Agregar Primer Cliente
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </main>

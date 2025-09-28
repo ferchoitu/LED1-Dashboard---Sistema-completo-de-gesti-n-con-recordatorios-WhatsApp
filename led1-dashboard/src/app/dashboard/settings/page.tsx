@@ -22,9 +22,13 @@ import {
   Check,
   AlertCircle,
   TrendingUp,
-  DollarSign
+  DollarSign,
+  Palette,
+  Sun,
+  Moon
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
+import { useTheme } from '@/contexts/ThemeContext'
 
 // Configuración inicial mock
 const initialSettings = {
@@ -50,6 +54,7 @@ const initialSettings = {
 
 export default function SettingsPage() {
   const { logout } = useAuth()
+  const { theme, toggleTheme } = useTheme()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('profile')
@@ -251,7 +256,7 @@ export default function SettingsPage() {
       {/* Main Content */}
       <div className="flex-1 lg:ml-64">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
+        <header className="nexus-header px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
@@ -260,7 +265,7 @@ export default function SettingsPage() {
               >
                 <Menu className="w-6 h-6" />
               </button>
-              <h1 className="text-2xl font-bold text-gray-900">Configuración</h1>
+              <h1 className="text-2xl font-bold text-primary">Configuración</h1>
             </div>
             {saveMessage && (
               <div className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded-lg">
@@ -310,6 +315,17 @@ export default function SettingsPage() {
                   <Shield className="w-4 h-4 mr-2 inline" />
                   Moderadores
                 </button>
+                <button
+                  onClick={() => setActiveTab('appearance')}
+                  className={`px-6 py-3 border-b-2 font-medium text-sm ${
+                    activeTab === 'appearance'
+                      ? 'border-indigo-500 text-indigo-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <Palette className="w-4 h-4 mr-2 inline" />
+                  Apariencia
+                </button>
               </nav>
             </div>
 
@@ -332,7 +348,7 @@ export default function SettingsPage() {
                             ...prev,
                             profile: { ...prev.profile, name: e.target.value }
                           }))}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                          className="nexus-input w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                         />
                       </div>
 
@@ -347,7 +363,7 @@ export default function SettingsPage() {
                             ...prev,
                             profile: { ...prev.profile, email: e.target.value }
                           }))}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                          className="nexus-input w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                         />
                       </div>
                     </div>
@@ -366,7 +382,7 @@ export default function SettingsPage() {
                       <select
                         value={settings.profile.timezone}
                         onChange={(e) => handleTimezoneChange(e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        className="nexus-select w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                       >
                         {timezones.map((tz) => (
                           <option key={tz.value} value={tz.value}>
@@ -495,6 +511,67 @@ export default function SettingsPage() {
                   </div>
                 </div>
               )}
+
+              {/* Tab: Apariencia */}
+              {activeTab === 'appearance' && (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Configuración de Apariencia</h3>
+                    <p className="text-sm text-gray-600 mb-6">Personaliza la apariencia de la aplicación según tus preferencias.</p>
+
+                    <div className="nexus-card p-6 bg-gray-50">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="p-3 rounded-full bg-indigo-100">
+                            {theme === 'dark' ? (
+                              <Moon className="w-6 h-6 text-indigo-600" />
+                            ) : (
+                              <Sun className="w-6 h-6 text-indigo-600" />
+                            )}
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-gray-900">Modo Oscuro</h4>
+                            <p className="text-sm text-gray-600">
+                              {theme === 'dark'
+                                ? 'Modo oscuro activado - Ideal para trabajar en ambientes con poca luz'
+                                : 'Modo claro activado - Apariencia tradicional con fondo blanco'
+                              }
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={toggleTheme}
+                          className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 ${
+                            theme === 'dark' ? 'bg-indigo-600' : 'bg-gray-200'
+                          }`}
+                        >
+                          <span className="sr-only">Activar modo oscuro</span>
+                          <span
+                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                              theme === 'dark' ? 'translate-x-5' : 'translate-x-0'
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="nexus-card p-6 bg-blue-50 border-blue-200 mt-6">
+                      <div className="flex items-start gap-3">
+                        <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
+                        <div>
+                          <h4 className="font-medium text-blue-900">Información sobre el Modo Oscuro</h4>
+                          <ul className="mt-2 text-sm text-blue-800 space-y-1">
+                            <li>• <strong>Modo Claro:</strong> Fondo blanco tradicional, ideal para ambientes con buena iluminación</li>
+                            <li>• <strong>Modo Oscuro:</strong> Fondo oscuro que reduce la fatiga visual en ambientes con poca luz</li>
+                            <li>• La configuración se guarda automáticamente y se aplicará en futuras sesiones</li>
+                            <li>• Todos los elementos de la interfaz se adaptan al modo seleccionado</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </main>
@@ -503,7 +580,7 @@ export default function SettingsPage() {
       {/* Modal: Cambiar Contraseña */}
       {showPasswordForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="nexus-card max-w-md w-full">
+          <div className="nexus-modal nexus-card max-w-md w-full">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-gray-900">Cambiar Contraseña</h2>
@@ -526,7 +603,7 @@ export default function SettingsPage() {
                       value={passwordForm.currentPassword}
                       onChange={(e) => setPasswordForm(prev => ({ ...prev, currentPassword: e.target.value }))}
                       required
-                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="nexus-input w-full px-4 py-3 pr-12 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     />
                     <button
                       type="button"
@@ -549,7 +626,7 @@ export default function SettingsPage() {
                       onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
                       required
                       minLength={8}
-                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="nexus-input w-full px-4 py-3 pr-12 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     />
                     <button
                       type="button"
@@ -572,7 +649,7 @@ export default function SettingsPage() {
                       onChange={(e) => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
                       required
                       minLength={8}
-                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="nexus-input w-full px-4 py-3 pr-12 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     />
                     <button
                       type="button"
@@ -609,7 +686,7 @@ export default function SettingsPage() {
       {/* Modal: Agregar Moderador */}
       {showAddModeratorForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="nexus-card max-w-md w-full">
+          <div className="nexus-modal nexus-card max-w-md w-full">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-gray-900">Agregar Moderador</h2>
@@ -631,7 +708,7 @@ export default function SettingsPage() {
                     value={moderatorForm.email}
                     onChange={(e) => setModeratorForm(prev => ({ ...prev, email: e.target.value }))}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="nexus-input w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     placeholder="moderador@email.com"
                   />
                 </div>
@@ -644,7 +721,7 @@ export default function SettingsPage() {
                     type="text"
                     value={moderatorForm.name}
                     onChange={(e) => setModeratorForm(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="nexus-input w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     placeholder="Nombre del moderador"
                   />
                 </div>
@@ -656,7 +733,7 @@ export default function SettingsPage() {
                   <select
                     value={moderatorForm.role}
                     onChange={(e) => setModeratorForm(prev => ({ ...prev, role: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="nexus-select w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   >
                     <option value="Moderador">Moderador</option>
                     <option value="Administrador">Administrador</option>

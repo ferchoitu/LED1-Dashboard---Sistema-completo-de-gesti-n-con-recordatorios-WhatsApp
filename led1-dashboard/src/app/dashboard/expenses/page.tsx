@@ -480,6 +480,28 @@ export default function ExpensesPage() {
                     </div>
                   </div>
                 ))}
+
+                {/* Empty state for fixed costs */}
+                {getFilteredFixedCosts().length === 0 && (
+                  <div className="p-12 text-center">
+                    <div className="max-w-md mx-auto">
+                      <div className="p-4 bg-gray-100 rounded-full inline-block mb-4">
+                        <Zap className="w-8 h-8 text-gray-400" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">No hay gastos fijos registrados</h3>
+                      <p className="text-gray-600 mb-6">
+                        Comienza agregando tus gastos fijos mensuales como alquiler, servicios, seguros, etc.
+                      </p>
+                      <button
+                        onClick={() => openModal('add')}
+                        className="nexus-btn nexus-btn-primary inline-flex items-center"
+                      >
+                        <Plus className="w-5 h-5 mr-2" />
+                        Agregar Primer Gasto Fijo
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -517,6 +539,28 @@ export default function ExpensesPage() {
                     </div>
                   </div>
                 ))}
+
+                {/* Empty state for video costs */}
+                {getFilteredVideoCosts().length === 0 && (
+                  <div className="p-12 text-center">
+                    <div className="max-w-md mx-auto">
+                      <div className="p-4 bg-gray-100 rounded-full inline-block mb-4">
+                        <Video className="w-8 h-8 text-gray-400" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">No hay gastos de video registrados</h3>
+                      <p className="text-gray-600 mb-6">
+                        Registra aquí los costos de creación de contenido publicitario para tus clientes.
+                      </p>
+                      <button
+                        onClick={() => openModal('add')}
+                        className="nexus-btn nexus-btn-primary inline-flex items-center"
+                      >
+                        <Plus className="w-5 h-5 mr-2" />
+                        Agregar Primer Gasto de Video
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
