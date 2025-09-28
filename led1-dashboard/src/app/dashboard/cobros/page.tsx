@@ -149,9 +149,13 @@ export default function CobrosPage() {
           <!-- Header -->
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px;">
             <div>
-              <svg width="120" height="40" style="margin-bottom: 16px;" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
-                <rect width="120" height="40" fill="#6366f1" rx="4"/>
-                <text x="60" y="25" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">LED1</text>
+              <svg width="120" height="44" style="margin-bottom: 16px;" viewBox="0 0 344.4 125.2" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                  <path d="M0,0h75.11l-37.59,76.2h37.59l-9.01,49.01H0V0Z" fill="#1f2937"/>
+                  <path d="M84.16.13h76.48v32.16h-41.81v17.12h36.45v26.79h-36.45v16.85h41.81v32.16h-85.53l33.01-75.79h-27.58L84.16.13Z" fill="#1f2937"/>
+                  <path d="M173.86.13h45.56c36.27,0,61.46,25.55,61.46,62.18s-25.37,62.89-61.46,62.89h-45.56V.13ZM216.56,93.04c18.76,0,28.05-10.18,28.05-30.2s-9.83-30.55-28.05-30.55h-6.97v60.75h6.97Z" fill="#1f2937"/>
+                  <path d="M308.84,41.58h-15.01v-24.66h5.54c9.65,0,14.29-5.54,14.29-16.8h30.73v125.07h-35.56V41.58Z" fill="#1f2937"/>
+                </g>
               </svg>
               <div style="color: #6b7280; font-size: 14px;">
                 <p style="margin: 0;">Pantallas LED Publicitarias</p>
@@ -299,7 +303,14 @@ export default function CobrosPage() {
       <div className={`nexus-sidebar fixed inset-y-0 left-0 w-64 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 transition-transform duration-300 z-30`}>
         <div className="p-6">
           <div className="flex items-center justify-center mb-8">
-            <img src="/logo-led1.png" alt="LED1" className="h-8" />
+            <svg width="80" height="29" viewBox="0 0 344.4 125.2" className="h-8">
+              <g>
+                <path d="M0,0h75.11l-37.59,76.2h37.59l-9.01,49.01H0V0Z" fill="currentColor"/>
+                <path d="M84.16.13h76.48v32.16h-41.81v17.12h36.45v26.79h-36.45v16.85h41.81v32.16h-85.53l33.01-75.79h-27.58L84.16.13Z" fill="currentColor"/>
+                <path d="M173.86.13h45.56c36.27,0,61.46,25.55,61.46,62.18s-25.37,62.89-61.46,62.89h-45.56V.13ZM216.56,93.04c18.76,0,28.05-10.18,28.05-30.2s-9.83-30.55-28.05-30.55h-6.97v60.75h6.97Z" fill="currentColor"/>
+                <path d="M308.84,41.58h-15.01v-24.66h5.54c9.65,0,14.29-5.54,14.29-16.8h30.73v125.07h-35.56V41.58Z" fill="currentColor"/>
+              </g>
+            </svg>
           </div>
 
           <nav className="space-y-2">
@@ -646,9 +657,13 @@ export default function CobrosPage() {
                 <div className="flex justify-between items-start mb-8">
                   <div>
                     <div className="mb-4">
-                      <svg width="120" height="40" viewBox="0 0 120 40" className="h-12">
-                        <rect width="120" height="40" fill="#6366f1" rx="4"/>
-                        <text x="60" y="25" fontFamily="Arial, sans-serif" fontSize="18" fontWeight="bold" fill="white" textAnchor="middle">LED1</text>
+                      <svg width="120" height="44" viewBox="0 0 344.4 125.2" className="h-12">
+                        <g>
+                          <path d="M0,0h75.11l-37.59,76.2h37.59l-9.01,49.01H0V0Z" fill="#1f2937"/>
+                          <path d="M84.16.13h76.48v32.16h-41.81v17.12h36.45v26.79h-36.45v16.85h41.81v32.16h-85.53l33.01-75.79h-27.58L84.16.13Z" fill="#1f2937"/>
+                          <path d="M173.86.13h45.56c36.27,0,61.46,25.55,61.46,62.18s-25.37,62.89-61.46,62.89h-45.56V.13ZM216.56,93.04c18.76,0,28.05-10.18,28.05-30.2s-9.83-30.55-28.05-30.55h-6.97v60.75h6.97Z" fill="#1f2937"/>
+                          <path d="M308.84,41.58h-15.01v-24.66h5.54c9.65,0,14.29-5.54,14.29-16.8h30.73v125.07h-35.56V41.58Z" fill="#1f2937"/>
+                        </g>
                       </svg>
                     </div>
                     <div className="text-sm text-gray-600">
