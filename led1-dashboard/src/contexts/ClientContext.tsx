@@ -15,6 +15,7 @@ export interface Client {
   endDate: string | null
   status: 'active' | 'inactive' | 'suspended'
   plan: string
+  includeIVA: boolean
 }
 
 export interface Expense {
@@ -73,7 +74,13 @@ export function ClientProvider({ children }: { children: ReactNode }) {
     const savedPayments = localStorage.getItem('led1-payments')
 
     if (savedClients) {
-      setClients(JSON.parse(savedClients))
+      const parsedClients = JSON.parse(savedClients)
+      // Migrar clientes existentes agregando el campo includeIVA si no existe
+      const migratedClients = parsedClients.map((client: any) => ({
+        ...client,
+        includeIVA: client.includeIVA !== undefined ? client.includeIVA : false
+      }))
+      setClients(migratedClients)
     } else {
       // Si no hay datos guardados, usar arrays vacíos
       setClients([])

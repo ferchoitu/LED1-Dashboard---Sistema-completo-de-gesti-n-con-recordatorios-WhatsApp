@@ -47,7 +47,8 @@ export default function ClientsPage() {
     startDate: '',
     endDate: null,
     status: 'active',
-    plan: 'Básico'
+    plan: 'Básico',
+    includeIVA: false
   })
 
   const { clients, addClient, updateClient, deleteClient } = useClients()
@@ -105,7 +106,8 @@ export default function ClientsPage() {
       startDate: '',
       endDate: null,
       status: 'active',
-      plan: 'Básico'
+      plan: 'Básico',
+      includeIVA: false
     })
   }
 
@@ -270,6 +272,7 @@ export default function ClientsPage() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contacto</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monto</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Día de cobro</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IVA</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                   </tr>
@@ -295,6 +298,22 @@ export default function ClientsPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {client.billingDay}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={client.includeIVA || false}
+                              onChange={(e) => updateClient(client.id, { includeIVA: e.target.checked })}
+                              className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                          </label>
+                          <span className="ml-2 text-xs text-gray-600">
+                            {client.includeIVA ? 'Con IVA' : 'Sin IVA'}
+                          </span>
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {getStatusBadge(client.status)}
@@ -410,6 +429,16 @@ export default function ClientsPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
                 {getStatusBadge(selectedClient.status)}
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">IVA</label>
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                  selectedClient.includeIVA
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-gray-100 text-gray-800'
+                }`}>
+                  {selectedClient.includeIVA ? 'Incluye IVA' : 'Sin IVA'}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -520,6 +549,26 @@ export default function ClientsPage() {
                   <option value="inactive">Inactivo</option>
                   <option value="suspended">Suspendido</option>
                 </select>
+              </div>
+              <div className="col-span-2">
+                <div className="flex items-center justify-between">
+                  <label className="block text-sm font-medium text-gray-700">Incluir IVA en facturación</label>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.includeIVA || false}
+                      onChange={(e) => setFormData({ ...formData, includeIVA: e.target.checked })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    <span className="ml-3 text-sm text-gray-600">
+                      {formData.includeIVA ? 'Con IVA' : 'Sin IVA'}
+                    </span>
+                  </label>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Si está activado, se agregará el 21% de IVA al monto mensual en las facturas
+                </p>
               </div>
             </form>
 

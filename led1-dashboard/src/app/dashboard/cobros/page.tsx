@@ -37,6 +37,7 @@ interface InvoiceData {
   invoiceNumber: string
   dueDate: string
   issueDate: string
+  includeIVA: boolean
 }
 
 export default function CobrosPage() {
@@ -117,7 +118,8 @@ export default function CobrosPage() {
           year: selectedYear,
           invoiceNumber,
           issueDate,
-          dueDate
+          dueDate,
+          includeIVA: client.includeIVA || false
         }
       })
   }
@@ -223,11 +225,11 @@ export default function CobrosPage() {
               </div>
               <div style="display: flex; justify-content: space-between; padding: 8px 0;">
                 <span style="font-weight: 600;">IVA (21%):</span>
-                <span>${formatCurrency(0)}</span>
+                <span>${formatCurrency(invoice.includeIVA ? invoice.monthlyAmount * 0.21 : 0)}</span>
               </div>
               <div style="display: flex; justify-content: space-between; padding: 8px 0; border-top: 2px solid #1f2937; font-size: 18px; font-weight: bold;">
                 <span>TOTAL:</span>
-                <span>${formatCurrency(invoice.monthlyAmount)}</span>
+                <span>${formatCurrency(invoice.includeIVA ? invoice.monthlyAmount * 1.21 : invoice.monthlyAmount)}</span>
               </div>
             </div>
           </div>
@@ -481,9 +483,12 @@ export default function CobrosPage() {
               </div>
               <h3 className="text-sm font-medium text-gray-600 uppercase tracking-wide">Monto Total</h3>
               <p className="text-3xl font-bold text-gray-900 mt-2">
-                {formatCurrency(invoices.reduce((total, invoice) => total + invoice.monthlyAmount, 0))}
+                {formatCurrency(invoices.reduce((total, invoice) => {
+                  const amount = invoice.includeIVA ? invoice.monthlyAmount * 1.21 : invoice.monthlyAmount
+                  return total + amount
+                }, 0))}
               </p>
-              <p className="text-sm text-green-600 mt-1">A facturar</p>
+              <p className="text-sm text-green-600 mt-1">A facturar (con IVA incluido)</p>
             </div>
 
             <div className="nexus-card p-6 fade-in">
@@ -564,7 +569,7 @@ export default function CobrosPage() {
                         </td>
                         <td className="px-6 py-4 text-right">
                           <div className="text-sm font-semibold text-gray-900">{formatCurrency(invoice.monthlyAmount)}</div>
-                          <div className="text-xs text-gray-500">IVA no incluido</div>
+                          <div className="text-xs text-gray-500">{invoice.includeIVA ? '+ IVA' : 'IVA no incluido'}</div>
                         </td>
                         <td className="px-6 py-4">
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
@@ -741,11 +746,11 @@ export default function CobrosPage() {
                     </div>
                     <div className="flex justify-between py-2">
                       <span className="font-semibold text-gray-900">IVA (21%):</span>
-                      <span className="text-gray-900">{formatCurrency(0)}</span>
+                      <span className="text-gray-900">{formatCurrency(previewInvoice.includeIVA ? previewInvoice.monthlyAmount * 0.21 : 0)}</span>
                     </div>
                     <div className="flex justify-between py-2 border-t-2 border-gray-800">
                       <span className="text-lg font-bold text-gray-900">TOTAL:</span>
-                      <span className="text-lg font-bold text-gray-900">{formatCurrency(previewInvoice.monthlyAmount)}</span>
+                      <span className="text-lg font-bold text-gray-900">{formatCurrency(previewInvoice.includeIVA ? previewInvoice.monthlyAmount * 1.21 : previewInvoice.monthlyAmount)}</span>
                     </div>
                   </div>
                 </div>
