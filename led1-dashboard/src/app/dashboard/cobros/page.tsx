@@ -223,11 +223,11 @@ export default function CobrosPage() {
               </div>
               <div style="display: flex; justify-content: space-between; padding: 8px 0;">
                 <span style="font-weight: 600;">IVA (21%):</span>
-                <span>${formatCurrency(invoice.monthlyAmount * 0.21)}</span>
+                <span>${formatCurrency(0)}</span>
               </div>
               <div style="display: flex; justify-content: space-between; padding: 8px 0; border-top: 2px solid #1f2937; font-size: 18px; font-weight: bold;">
                 <span>TOTAL:</span>
-                <span>${formatCurrency(invoice.monthlyAmount * 1.21)}</span>
+                <span>${formatCurrency(invoice.monthlyAmount)}</span>
               </div>
             </div>
           </div>
@@ -564,7 +564,7 @@ export default function CobrosPage() {
                         </td>
                         <td className="px-6 py-4 text-right">
                           <div className="text-sm font-semibold text-gray-900">{formatCurrency(invoice.monthlyAmount)}</div>
-                          <div className="text-xs text-gray-500">+ IVA</div>
+                          <div className="text-xs text-gray-500">IVA no incluido</div>
                         </td>
                         <td className="px-6 py-4">
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
@@ -741,11 +741,11 @@ export default function CobrosPage() {
                     </div>
                     <div className="flex justify-between py-2">
                       <span className="font-semibold text-gray-900">IVA (21%):</span>
-                      <span className="text-gray-900">{formatCurrency(previewInvoice.monthlyAmount * 0.21)}</span>
+                      <span className="text-gray-900">{formatCurrency(0)}</span>
                     </div>
                     <div className="flex justify-between py-2 border-t-2 border-gray-800">
                       <span className="text-lg font-bold text-gray-900">TOTAL:</span>
-                      <span className="text-lg font-bold text-gray-900">{formatCurrency(previewInvoice.monthlyAmount * 1.21)}</span>
+                      <span className="text-lg font-bold text-gray-900">{formatCurrency(previewInvoice.monthlyAmount)}</span>
                     </div>
                   </div>
                 </div>
