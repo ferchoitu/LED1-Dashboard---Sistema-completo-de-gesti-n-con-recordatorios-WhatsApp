@@ -272,7 +272,6 @@ export default function ClientsPage() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contacto</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monto</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Día de cobro</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IVA</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                   </tr>
@@ -300,44 +299,50 @@ export default function ClientsPage() {
                         {client.billingDay}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={client.includeIVA || false}
-                              onChange={(e) => updateClient(client.id, { includeIVA: e.target.checked })}
-                              className="sr-only peer"
-                            />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                          </label>
-                          <span className="ml-2 text-xs text-gray-600">
-                            {client.includeIVA ? 'Con IVA' : 'Sin IVA'}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
                         {getStatusBadge(client.status)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleView(client)}
-                            className="text-indigo-600 hover:text-indigo-900"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleEdit(client)}
-                            className="text-blue-600 hover:text-blue-900"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(client)}
-                            className="text-red-600 hover:text-red-900"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                        <div className="flex items-center gap-3">
+                          {/* IVA Toggle */}
+                          <div className="flex items-center">
+                            <label className="relative inline-flex items-center cursor-pointer" title={client.includeIVA ? 'IVA activado' : 'IVA desactivado'}>
+                              <input
+                                type="checkbox"
+                                checked={client.includeIVA || false}
+                                onChange={(e) => updateClient(client.id, { includeIVA: e.target.checked })}
+                                className="sr-only peer"
+                              />
+                              <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[1px] after:left-[1px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                            <span className="ml-1 text-xs text-gray-500">
+                              {client.includeIVA ? 'IVA' : 'S/IVA'}
+                            </span>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex gap-1">
+                            <button
+                              onClick={() => handleView(client)}
+                              className="text-indigo-600 hover:text-indigo-900 p-1"
+                              title="Ver detalles"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleEdit(client)}
+                              className="text-blue-600 hover:text-blue-900 p-1"
+                              title="Editar cliente"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(client)}
+                              className="text-red-600 hover:text-red-900 p-1"
+                              title="Eliminar cliente"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
                         </div>
                       </td>
                     </tr>
