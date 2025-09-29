@@ -18,7 +18,8 @@ import {
   ChevronDown,
   Mail,
   Phone,
-  MapPin
+  MapPin,
+  X
 } from 'lucide-react'
 import { useClients } from '@/contexts/ClientContext'
 import { useAuth } from '@/contexts/AuthContext'
@@ -51,6 +52,14 @@ export default function CobrosPage() {
   const [showPreview, setShowPreview] = useState(false)
   const [previewInvoice, setPreviewInvoice] = useState<InvoiceData | null>(null)
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
+  const [showNewInvoiceModal, setShowNewInvoiceModal] = useState(false)
+  const [newInvoiceData, setNewInvoiceData] = useState({
+    clientId: '',
+    customMonth: new Date().getMonth() + 1,
+    customYear: new Date().getFullYear(),
+    customAmount: '',
+    description: 'Servicio de Pantalla LED'
+  })
   const invoiceRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -288,6 +297,55 @@ export default function CobrosPage() {
     alert(`Descargando ${invoices.length} facturas del mes ${months.find(m => m.value === selectedMonth)?.label} ${selectedYear}`)
   }
 
+  const handleNewInvoice = () => {
+    setShowNewInvoiceModal(true)
+  }
+
+  const handleCreateCustomInvoice = async () => {
+    if (!newInvoiceData.clientId) {
+      alert('Por favor selecciona un cliente')
+      return
+    }
+
+    const client = clients.find(c => c.id === Number(newInvoiceData.clientId))
+    if (!client) {
+      alert('Cliente no encontrado')
+      return
+    }
+
+    const amount = newInvoiceData.customAmount ? Number(newInvoiceData.customAmount) : client.monthlyAmount
+    const invoiceNumber = generateInvoiceNumber(client.id, newInvoiceData.customMonth, newInvoiceData.customYear)
+    const issueDate = new Date().toISOString().split('T')[0]
+    const dueDate = calculateDueDate(client.billingDay, newInvoiceData.customMonth, newInvoiceData.customYear)
+
+    const customInvoice: InvoiceData = {
+      clientId: client.id,
+      clientName: client.name,
+      businessName: client.businessName,
+      email: client.email,
+      phone: client.phone,
+      address: client.address,
+      monthlyAmount: amount,
+      billingDay: client.billingDay,
+      month: newInvoiceData.customMonth,
+      year: newInvoiceData.customYear,
+      invoiceNumber,
+      issueDate,
+      dueDate,
+      includeIVA: client.includeIVA || false
+    }
+
+    await handleDownload(customInvoice)
+    setShowNewInvoiceModal(false)
+    setNewInvoiceData({
+      clientId: '',
+      customMonth: new Date().getMonth() + 1,
+      customYear: new Date().getFullYear(),
+      customAmount: '',
+      description: 'Servicio de Pantalla LED'
+    })
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -398,7 +456,10 @@ export default function CobrosPage() {
                 <Download className="w-4 h-4 mr-2" />
                 Exportar Todo
               </button>
-              <button className="nexus-btn nexus-btn-primary px-4 py-2">
+              <button
+                onClick={handleNewInvoice}
+                className="nexus-btn nexus-btn-primary px-4 py-2"
+              >
                 <FileText className="w-4 h-4 mr-2" />
                 Nueva Factura
               </button>
@@ -788,6 +849,162 @@ export default function CobrosPage() {
                     <Download className="w-4 h-4 mr-2" />
                   )}
                   {isGeneratingPDF ? 'Generando PDF...' : 'Descargar PDF'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* New Invoice Modal */}
+      {showNewInvoiceModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="nexus-modal nexus-card max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-gray-900">Nueva Factura Individual</h2>
+                <button
+                  onClick={() => setShowNewInvoiceModal(false)}
+                  className="p-2 text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Client Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Cliente *
+                  </label>
+                  <select
+                    value={newInvoiceData.clientId}
+                    onChange={(e) => setNewInvoiceData({ ...newInvoiceData, clientId: e.target.value })}
+                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="">Seleccionar cliente...</option>
+                    {clients.filter(client => client.status === 'active').map(client => (
+                      <option key={client.id} value={client.id}>
+                        {client.name} - {client.businessName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Period Selection */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Mes
+                    </label>
+                    <select
+                      value={newInvoiceData.customMonth}
+                      onChange={(e) => setNewInvoiceData({ ...newInvoiceData, customMonth: Number(e.target.value) })}
+                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    >
+                      {months.map(month => (
+                        <option key={month.value} value={month.value}>
+                          {month.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Año
+                    </label>
+                    <select
+                      value={newInvoiceData.customYear}
+                      onChange={(e) => setNewInvoiceData({ ...newInvoiceData, customYear: Number(e.target.value) })}
+                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    >
+                      {years.map(year => (
+                        <option key={year} value={year}>
+                          {year}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Custom Amount */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Monto personalizado (opcional)
+                  </label>
+                  <input
+                    type="number"
+                    value={newInvoiceData.customAmount}
+                    onChange={(e) => setNewInvoiceData({ ...newInvoiceData, customAmount: e.target.value })}
+                    placeholder="Dejar vacío para usar monto mensual del cliente"
+                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Si no se especifica, se usará el monto mensual configurado del cliente
+                  </p>
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Descripción del servicio
+                  </label>
+                  <input
+                    type="text"
+                    value={newInvoiceData.description}
+                    onChange={(e) => setNewInvoiceData({ ...newInvoiceData, description: e.target.value })}
+                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* Client Preview */}
+                {newInvoiceData.clientId && (
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    {(() => {
+                      const selectedClient = clients.find(c => c.id === Number(newInvoiceData.clientId))
+                      if (!selectedClient) return null
+
+                      const amount = newInvoiceData.customAmount ? Number(newInvoiceData.customAmount) : selectedClient.monthlyAmount
+                      const ivaAmount = selectedClient.includeIVA ? amount * 0.21 : 0
+                      const totalAmount = amount + ivaAmount
+
+                      return (
+                        <div>
+                          <h4 className="font-medium text-gray-900 mb-2">Vista previa</h4>
+                          <div className="text-sm text-gray-600 space-y-1">
+                            <p><strong>Cliente:</strong> {selectedClient.name}</p>
+                            <p><strong>Empresa:</strong> {selectedClient.businessName}</p>
+                            <p><strong>Monto base:</strong> {formatCurrency(amount)}</p>
+                            <p><strong>IVA:</strong> {formatCurrency(ivaAmount)} {selectedClient.includeIVA ? '(21%)' : '(No aplica)'}</p>
+                            <p><strong>Total:</strong> {formatCurrency(totalAmount)}</p>
+                          </div>
+                        </div>
+                      )
+                    })()}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => setShowNewInvoiceModal(false)}
+                  className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleCreateCustomInvoice}
+                  disabled={!newInvoiceData.clientId || isGeneratingPDF}
+                  className="nexus-btn nexus-btn-primary flex-1 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isGeneratingPDF ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                  ) : (
+                    <FileText className="w-4 h-4 mr-2" />
+                  )}
+                  {isGeneratingPDF ? 'Generando...' : 'Crear y Descargar'}
                 </button>
               </div>
             </div>
